@@ -221,7 +221,7 @@ inline void GeodesicAlgorithmVGMMP::propagate_vg(std::vector<SurfacePoint>& sour
         tmp_d_max = tmp_e * tmp_e / (2.0 * eps_vg * (min_interval->min() - tmp_e)) +tmp_e;
       }
       d_max_current = min(d_max_current, tmp_d_max); 
-      // printf("e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
+      // f fprintf(stderr,stderr,"e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
       if (min_interval->min() > d_max_current - 1e-6) continue;
     }
 
@@ -273,7 +273,7 @@ inline void GeodesicAlgorithmVGMMP::propagate_vg(std::vector<SurfacePoint>& sour
         tmp_d_max = tmp_e * tmp_e / (2.0 * eps_vg * (min_interval->min() - M)) + max(d0,d1) + min(min(Ab1,b0B),M);
       }
       d_max_current = min(d_max_current, tmp_d_max); 
-      // printf("e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
+      // fprintf(stderr,"e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
       if (min_interval->min() > d_max_current - 1e-6) continue;
     }
   
@@ -531,7 +531,7 @@ inline void GeodesicAlgorithmVGMMP::propagate_dgg(std::vector<SurfacePoint>& sou
         tmp_d_max = tmp_e * tmp_e / (2.0 * eps_vg * (min_interval->min() - tmp_e)) +tmp_e;
       }
       d_max_current = min(d_max_current, tmp_d_max); 
-      // printf("e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
+      // fprintf(stderr,"e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
       if (min_interval->min() > d_max_current - 1e-6) continue;
     }
 
@@ -583,7 +583,7 @@ inline void GeodesicAlgorithmVGMMP::propagate_dgg(std::vector<SurfacePoint>& sou
         tmp_d_max = tmp_e * tmp_e / (2.0 * eps_vg * (min_interval->min() - M)) + max(d0,d1) + min(min(Ab1,b0B),M);
       }
       d_max_current = min(d_max_current, tmp_d_max); 
-      // printf("e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
+      // fprintf(stderr,"e %lf d_max %lf current %lf\n" , tmp_e, tmp_d_max, min_interval->min());
       if (min_interval->min() > d_max_current - 1e-6) continue;
     }
 

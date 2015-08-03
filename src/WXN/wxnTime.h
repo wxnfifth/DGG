@@ -19,7 +19,7 @@ public:
 		}
 		LARGE_INTEGER li;
 		if( !QueryPerformanceFrequency(&li) ){
-			cout << "QueryPerformanceFrequency failed!\n";
+			fprintf(stderr,"QueryPerformanceFrequency failed!\n");
 			return;
 		}
 		PCFreq = double(li.QuadPart) / 1000.0;
@@ -30,7 +30,7 @@ public:
 	void start(){
 		LARGE_INTEGER li;
 		if( !QueryPerformanceFrequency(&li) ){
-			cout << "QueryPerformanceFrequency failed!\n";
+			fprintf(stderr, "QueryPerformanceFrequency failed!\n");
 			return;
 		}
 		PCFreq = double(li.QuadPart) / 1000.0;
@@ -51,7 +51,8 @@ public:
 		//printf( "pcfreq %lf\n" , PCFreq );
 		if( tmpMessage.size() != 0 ) 
 			tmpMessage = tmpMessage +",";
-		printf( "%s time : %lf seconds\n\r" ,  tmpMessage.c_str() , double(li.QuadPart-CounterStart)/PCFreq/1000.0 );
+		fprintf(stderr, "%s time : %lf seconds\n\r" ,  tmpMessage.c_str() , double(li.QuadPart-CounterStart)/PCFreq/1000.0 );
+    //fflush(stdout);
 		return;
 	}
 	

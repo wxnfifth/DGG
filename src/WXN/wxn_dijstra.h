@@ -15,83 +15,6 @@
 #include "ICH\RichModel.h"
 
 template<typename T>  class SparseGraph{
-private:
-  //struct HeadOfSVG {
-  //  int begin_vertex_index;
-  //  int end_vertex_index;
-  //  int num_of_vertex;
-  //  HeadOfSVG(int _begin_vertex_index , 
-  //    int _end_vertex_index , 
-  //    int _num_of_vertex)
-  //    :
-  //  begin_vertex_index(_begin_vertex_index) ,
-  //    end_vertex_index(_end_vertex_index) , 
-  //    num_of_vertex(_num_of_vertex){}
-  //  HeadOfSVG(){}
-  //  void print(){
-  //    printf("head of svg : num_of_vertex %d\n" , num_of_vertex);
-  //  }
-  //};
-
-  //struct BodyHeadOfSVG{
-  //  int source_index;
-  //  int neighbor_num;
-  //  BodyHeadOfSVG(int _source_index , int _neighbor_num)
-  //  {
-  //    source_index = _source_index;
-  //    neighbor_num = _neighbor_num;
-  //  }
-  //  BodyHeadOfSVG(){}
-  //  void print(){
-  //    printf("source_index %d\n" , source_index);
-  //    printf("neighbor_num %d\n" , neighbor_num);
-  //  }
-  //};
-
-  //struct BodyPartOfSVG{
-  //  int dest_index;
-  //  float dest_dis;
-  //  BodyPartOfSVG(){}
-  //  BodyPartOfSVG(int _dest_index , float _dest_dis):
-  //    dest_index(_dest_index),
-  //    dest_dis(_dest_dis),
-  //  {
-  //    dest_index = _dest_index;
-  //    dest_dis = _dest_dis;
-  //  }
-  //};
-
-  //struct BodyPartOfSVGWithAngle{
-  //  int dest_index;
-  //  float dest_dis;
-  //  float angle;
-  //  int begin_pos;
-  //  int end_pos;
-  //  BodyPartOfSVGWithAngle(){}
-  //  BodyPartOfSVGWithAngle(int _dest_index , float _dest_dis, float _angle, int _begin_pos, int _end_pos):
-  //    dest_index(_dest_index),
-  //    dest_dis(_dest_dis),
-  //    angle(_angle),
-  //    begin_pos(_begin_pos),
-  //    end_pos(_end_pos)
-  //  {
-  //  }
-  //  bool operator<(const BodyPartOfSVGWithAngle& o) const{
-  //    return angle < o.angle;
-  //  }
-  //};
-
-  //struct BodyPartOfSVGWithK : BodyPartOfSVG{
-  //  int rank_k;
-  //  BodyPartOfSVGWithK(){}
-  //  BodyPartOfSVGWithK(int _dest_index , float _dest_dis , int _rank_k):
-  //    BodyPartOfSVG(_dest_index , _dest_dis),
-  //    rank_k(_rank_k){}
-  //  bool operator<(const BodyPartOfSVGWithK& other)const{
-  //    return rank_k < other.rank_k;
-  //  }
-  //};
-
 
 protected:
   std::vector<std::vector<int>> graph_neighbor;
@@ -102,15 +25,12 @@ protected:
   std::vector<std::vector<pair<int,int>>> graph_neighbor_begin_end_pos;
   std::vector<std::map<int,int>> graph_neighbor_map;
 
-
-public:
-  //double theta;
-  CRichModel* model_ptr;
-
 public:
   SparseGraph(){
     node_number_ = -1;
   }
+
+private:
 
   void initialize(int _node_number) {
     node_number_ = _node_number;
@@ -143,6 +63,12 @@ public:
     graph_neighbor_angle[u].reserve(number_of_neighbor);
     graph_neighbor_begin_end_pos[u].reserve(number_of_neighbor);
   }
+  void allocate_for_neighbor_with_range(int u , int number_of_neighbor) {
+    graph_neighbor[u].reserve(number_of_neighbor);
+    graph_pos_in_neighbor[u].reserve(number_of_neighbor);
+    graph_neighbor_dis[u].reserve(number_of_neighbor);
+    graph_neighbor_begin_end_pos[u].reserve(number_of_neighbor);
+  }
 
   void addedge(int u , int v , T w) {
     //u , v is the two edge
@@ -150,6 +76,16 @@ public:
     assert(u < node_number_ && v < node_number_);
     graph_neighbor[u].push_back(v);
     graph_neighbor_dis[u].push_back(w);
+  }
+
+  void addedge_with_range(int u , int v , T w, int begin_pos , int end_pos) {
+    //u , v is the two edge
+    // w is the distance
+    assert(u < node_number_ && v < node_number_);
+    graph_neighbor[u].push_back(v);
+    graph_neighbor_dis[u].push_back(w);
+    graph_neighbor_map[u][v] = graph_neighbor_angle[u].size();
+    graph_neighbor_begin_end_pos[u].push_back(make_pair(begin_pos,end_pos));
   }
 
   void addedge(int u , int v , T w, T angle, int begin_pos , int end_pos) {
@@ -163,11 +99,12 @@ public:
     graph_neighbor_begin_end_pos[u].push_back(make_pair(begin_pos,end_pos));
   }
 
+public:
   int NodeNum() {
     return node_number_;
   }
 
-  int read_svg_file_binary(const std::string& svg_file_name) {
+  virtual int read_svg_file_binary(const std::string& svg_file_name) {
 
     std::ifstream input_file (svg_file_name, std::ios::in | std::ios::binary);
     HeadOfSVG head_of_svg;
@@ -201,12 +138,12 @@ public:
     }
 
     average_neighbor_number /= head_of_svg.num_of_vertex;
-    printf("average_neigh %lf\n" , average_neighbor_number);
+    fprintf(stderr,"average_neigh %lf\n" , average_neighbor_number);
     std::cerr << "reading done..\n";
     input_file.close();
 
-    printf("size v1 %dM\n" , sizeof(graph_neighbor));
-    printf("size graph_neighbor_dis %d M\n" , sizeof(graph_neighbor_dis));
+    fprintf(stderr,"size v1 %dM\n" , sizeof(graph_neighbor));
+    fprintf(stderr,"size graph_neighbor_dis %d M\n" , sizeof(graph_neighbor_dis));
     return 0;
   }
 
@@ -249,7 +186,7 @@ public:
     }
 
     average_neighbor_number /= head_of_svg.num_of_vertex;
-    printf("average_neigh %lf\n" , average_neighbor_number);
+    fprintf(stderr,"average_neigh %lf\n" , average_neighbor_number);
     std::cerr << "reading done..\n";
     input_file.close();
 
@@ -265,6 +202,52 @@ public:
     return 0;
   }
 
+  //int read_svg_file_with_range(const std::string& svg_file_name) {
+  //  std::ifstream input_file (svg_file_name, std::ios::in | std::ios::binary);
+  //  HeadOfSVG head_of_svg;
+  //  input_file.read( (char*)&head_of_svg , sizeof(head_of_svg));
+  //  head_of_svg.print();
+  //  initialize(head_of_svg.num_of_vertex);
+  //  double average_neighbor_number(0.0);
+  //  double max_radius_in_file(0.0);
+  //  double average_radius(0.0);
+  //  for (int i = 0; i < head_of_svg.num_of_vertex;++i) {
+  //    BodyHeadOfSVG body_head;
+  //    input_file.read( (char*)&body_head , sizeof(body_head));
+  //    average_neighbor_number += (double)body_head.neighbor_num;
+  //    std::vector<BodyPartOfSVGWithRange> body_parts;
+  //    for(int j = 0; j < body_head.neighbor_num;++j){ 
+  //      BodyPartOfSVGWithRange body_part;
+  //      input_file.read((char*)&body_part , sizeof(body_part));
+  //      body_parts.push_back(body_part);
+  //    }
+  //    allocate_for_neighbor_with_range(body_head.source_index , body_parts.size());
+  //    for (int j = 0; j < body_parts.size();++j) {
+  //      addedge_with_range(body_head.source_index ,
+  //        body_parts[j].dest_index ,
+  //        body_parts[j].dest_dis,
+  //        body_parts[j].begin_pos,
+  //        body_parts[j].end_pos
+  //        );
+  //    }
+  //    if( i > 0 && i % (head_of_svg.num_of_vertex / 10 ) == 0 ){
+  //      std::cerr << "read " << i * 100 / head_of_svg.num_of_vertex  << " percent \n";
+  //    }
+  //  }
+  //  average_neighbor_number /= head_of_svg.num_of_vertex;
+  //  fprintf(stderr,"average_neigh %lf\n" , average_neighbor_number);
+  //  std::cerr << "reading done..\n";
+  //  input_file.close();
+  //  for (int i = 0; i < graph_pos_in_neighbor.size(); ++i) {
+  //    graph_pos_in_neighbor[i].resize(graph_neighbor[i].size());
+  //    for (int j = 0; j < graph_neighbor[i].size(); ++j) {
+  //      int neigh = graph_neighbor[i][j];
+  //      int pos = graph_neighbor_map[neigh][i];
+  //      graph_pos_in_neighbor[i][j] = pos;
+  //    }
+  //  }
+  //  return 0;
+  //}
 
   virtual void findShortestDistance(int source)=0;
   //virtual int getSource(int v)=0;
@@ -286,7 +269,7 @@ template <typename T> class LC_FIM:public SparseGraph<T> {
 
   void getPath(const int& dest , std::vector<int>& path_nodes){
 
-      printf("error in line 248!\n");
+      fprintf(stderr,"error in line 248!\n");
 
   }
 
@@ -441,8 +424,8 @@ public:
         }
       }
     }
-        printf("********* processed_element %d total_vert %d percenter %.2lf%%\n" , processed_ele_ment, node_number_, processed_ele_ment / (double) node_number_ * 100.0); 
-        printf("********* total_neigh %d total_vert %d percenter %.2lf%%\n" , total_neigh, node_number_, total_neigh / (double) node_number_ * 100.0); 
+        fprintf(stderr,"********* processed_element %d total_vert %d percenter %.2lf%%\n" , processed_ele_ment, node_number_, processed_ele_ment / (double) node_number_ * 100.0); 
+        fprintf(stderr,"********* total_neigh %d total_vert %d percenter %.2lf%%\n" , total_neigh, node_number_, total_neigh / (double) node_number_ * 100.0); 
 
 
   }
@@ -477,6 +460,15 @@ private:
 public:
   LC_HY(){}
 
+private:
+  const CRichModel* model_ptr;
+
+public:
+  void setModel(const CRichModel& model) {
+    model_ptr = &model;
+  }
+
+
   void getPath(const int& dest , std::vector<int>& path_nodes) {
     path_nodes.clear();
     int u = dest;
@@ -490,7 +482,7 @@ public:
   
   void findShortestDistance(int source)
   {
-    printf("???\n");
+    fprintf(stderr,"???\n");
     vector<int> father_in_neighbor_pos(node_number_);
 
     fathers.resize(node_number_);
@@ -555,7 +547,7 @@ public:
         //T father_angle = graph_neighbor_angle_map[u][father_u];
         //int father_pos = graph_neighbor_map[u][father_u];
        int father_pos = father_in_neighbor_pos[u];
-        // printf("father_pos %d pos_in_neigh %d\n" , father_pos, father_in_neighbor_pos[u]); 
+        // fprintf(stderr,"father_pos %d pos_in_neigh %d\n" , father_pos, father_in_neighbor_pos[u]); 
         //T father_angle = graph_neighbor_angle[u][father_pos];
 
         //based on father_angle as 0 
@@ -630,13 +622,13 @@ public:
 
       }
     }
-    printf("********* processed_element %d total_vert %d percenter %.2lf%%\n" , processed_ele_ment, node_number_, processed_ele_ment / (double) node_number_ * 100.0); 
-    printf("********* total_neigh %d total_vert %d percente %.2lf%%\n" , total_neigh, node_number_, total_neigh / (double) node_number_ * 100.0);
+    fprintf(stderr,"********* processed_element %d total_vert %d percenter %.2lf%%\n" , processed_ele_ment, node_number_, processed_ele_ment / (double) node_number_ * 100.0); 
+    fprintf(stderr,"********* total_neigh %d total_vert %d percente %.2lf%%\n" , total_neigh, node_number_, total_neigh / (double) node_number_ * 100.0);
   }
 
   //  void findShortestDistance_backup(int source)
   //{
-  //  printf("???\n");
+  //  fprintf(stderr,"???\n");
   //  fathers.resize(node_number_);
   //  fill(fathers.begin(),fathers.end(),-1);
   //  dis.resize(node_number_);
@@ -725,8 +717,8 @@ public:
   //      }
   //    }
   //  }
-  //  printf("********* processed_element %d total_vert %d percenter %.2lf%%\n" , processed_ele_ment, node_number_, processed_ele_ment / (double) node_number_ * 100.0); 
-  //  printf("********* total_neigh %d total_vert %d percente %.2lf%%\n" , total_neigh, node_number_, total_neigh / (double) node_number_ * 100.0);
+  //  fprintf(stderr,"********* processed_element %d total_vert %d percenter %.2lf%%\n" , processed_ele_ment, node_number_, processed_ele_ment / (double) node_number_ * 100.0); 
+  //  fprintf(stderr,"********* total_neigh %d total_vert %d percente %.2lf%%\n" , total_neigh, node_number_, total_neigh / (double) node_number_ * 100.0);
   //}
 
 

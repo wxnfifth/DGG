@@ -60,6 +60,10 @@ public:
 	virtual unsigned best_source(SurfacePoint& point,			//after propagation step is done, quickly find what source this point belongs to and what is the distance to this source
 								 double& best_source_distance) {return 0;} 
 
+  virtual unsigned best_source_with_angle(SurfacePoint& point,
+                 double& best_source_distance,
+                 double& angle) {return 0;}
+
 	virtual void print_statistics()		//print info about timing and memory usage in the propagation step of the algorithm
 	{
 #ifdef DOTEST

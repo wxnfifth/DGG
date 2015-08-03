@@ -5,7 +5,7 @@
 
 void TexturedFaces::calculateCoveredFaces()
 {
-    printf("coverted vertex %d\n" , planar_coordinates.size());
+    fprintf(stderr,"coverted vertex %d\n" , planar_coordinates.size());
     set<int> textured_faces_set;
     textured_faces_set.clear();
     for(map<int,Point2D>::const_iterator itr = planar_coordinates.begin(); itr != planar_coordinates.end(); ++itr) {
@@ -82,11 +82,11 @@ void TexturedFaces::mapPointToModel(const Point2D& p , PointOnFace& point_on_fac
     
     dumpTexturedFaces();
     p.print("Point2D p");
-    printf("face_ids : ");
+    fprintf(stderr,"face_ids : ");
     for (int i = 0; i < face_ids.size();++i) {
-        printf("%d " , face_ids[i]);
+        fprintf(stderr,"%d " , face_ids[i]);
     }
-    printf("\n");
+    fprintf(stderr,"\n");
     assert(false);
     //}
 }
@@ -278,7 +278,7 @@ void TexturedFacesWithControlPoints::renderControlPoints()const
         renderSphere(temp_control_points[i].Point_3D() , 
                      color_green ,
                      control_point_radius);
-        printf("draw temp_control_points!\n");
+        fprintf(stderr,"draw temp_control_points!\n");
     }
     for (int i = 0; i < control_edges.size(); ++i) {
         const PointOnFace& p0 = control_points[control_edges[i].e1].p_3d;

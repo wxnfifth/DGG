@@ -158,13 +158,13 @@ void svg_precompute_jiajun_output(const string& input_obj_name, double eps_vg, s
   bool success = geodesic::read_mesh_from_file(input_obj_name.c_str(),points,faces, realIndex, originalVertNum);
   if(!success)
   {
-    cout << "something is wrong with the input file" << endl;
+     fprintf(stderr, "something is wrong with the input file" );
     return;
   }
   geodesic::Mesh mesh;
   mesh.initialize_mesh_data(points, faces);		//create internal
   clock_t end = clock();
-  cout << "loading model took " << (double)(end - start) / (double)CLOCKS_PER_SEC << " seconds." << endl;
+  fprintf(stderr,  "loading model took %lf seconds" , (double)(end - start) / (double)CLOCKS_PER_SEC );
 
   svg_file_name = input_obj_name.substr(0,input_obj_name.length() - 4 ) 
     + "_VG" + to_string(eps_vg) +  ".binary";
@@ -245,7 +245,7 @@ void svg_precompute_jiajun_output(const string& input_obj_name, double eps_vg, s
       covered_points[_index].dis = d.second;
       _index ++;
       //if (fabs(dis - d.second) > 1e-6) {
-      //  printf("dis %lf origin %lf\n", dis, d.second);
+      //  fprintf(stderr,"dis %lf origin %lf\n", dis, d.second);
       //}
       dests.push_back(make_pair(d.first,d.second));
     }
@@ -303,13 +303,13 @@ void svg_precompute_jiajun(const string& input_obj_name, double eps_vg, string& 
   bool success = geodesic::read_mesh_from_file(input_obj_name.c_str(),points,faces, realIndex, originalVertNum);
   if(!success)
   {
-    cout << "something is wrong with the input file" << endl;
+     fprintf(stderr, "something is wrong with the input file" );
     return;
   }
   geodesic::Mesh mesh;
   mesh.initialize_mesh_data(points, faces);		//create internal
   clock_t end = clock();
-  cout << "loading model took " << (double)(end - start) / (double)CLOCKS_PER_SEC << " seconds." << endl;
+  fprintf(stderr,  "loading model took %lf seconds" , (double)(end - start) / (double)CLOCKS_PER_SEC );
 
   svg_file_name = input_obj_name.substr(0,input_obj_name.length() - 4 ) 
     + "_VG" + to_string(eps_vg) +  ".binary";
@@ -387,7 +387,7 @@ void svg_precompute_jiajun(const string& input_obj_name, double eps_vg, string& 
       _index ++;
       //printf("v %d dis %lf\n" , d.first, d.second);
       //if (fabs(dis - d.second) > 1e-6) {
-      //  printf("dis %lf origin %lf\n", dis, d.second);
+      //  fprintf(stderr,"dis %lf origin %lf\n", dis, d.second);
       //}
       dests.push_back(make_pair(d.first,d.second));
     }
@@ -428,15 +428,15 @@ void svg_precompute_mmp(const string& input_obj_name, const int fixed_k, string&
 
 	clock_t start = clock();
 	bool success = geodesic::read_mesh_from_file(input_obj_name.c_str(),points,faces, realIndex, originalVertNum);
-	if(!success)
-	{
-		cout << "something is wrong with the input file" << endl;
-		return;
+  if(!success)
+  {
+     fprintf(stderr, "something is wrong with the input file" );
+    return;
   }
   geodesic::Mesh mesh;
   mesh.initialize_mesh_data(points, faces);		//create internal
   clock_t end = clock();
-	cout << "loading model took " << (double)(end - start) / (double)CLOCKS_PER_SEC << " seconds." << endl;
+  fprintf(stderr,  "loading model took %lf seconds" , (double)(end - start) / (double)CLOCKS_PER_SEC );
 
   svg_file_name = input_obj_name.substr(0,input_obj_name.length() - 4 ) 
     + "_SVGMMP_k" + to_string(fixed_k) +  ".binary";
@@ -513,7 +513,7 @@ void svg_precompute_mmp(const string& input_obj_name, const int fixed_k, string&
       covered_points[_index].dis = d.second;
       _index ++;
       if (fabs(dis - d.second) > 1e-6) {
-        printf("dis %lf origin %lf\n", dis, d.second);
+        fprintf(stderr,"dis %lf origin %lf\n", dis, d.second);
       }
       dests.push_back(make_pair(d.first,d.second));
     }
@@ -665,7 +665,7 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
 
   double theta = asin(sqrt(eps_vg));
   theta *= const_for_theta;
-  printf("******** eps %lf const %lf theta %lf du\n" , eps_vg, const_for_theta, theta  / M_PI * 180.0);
+  fprintf(stderr,"******** eps %lf const %lf theta %lf du\n" , eps_vg, const_for_theta, theta  / M_PI * 180.0);
 
   std::vector<double> points;	
   std::vector<unsigned> faces;
@@ -678,13 +678,13 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
   bool success = geodesic::read_mesh_from_file(input_obj_name.c_str(),points,faces, realIndex, originalVertNum);
   if(!success)
   {
-    cout << "something is wrong with the input file" << endl;
+     fprintf(stderr, "something is wrong with the input file" );
     return;
   }
   geodesic::Mesh mesh;
   mesh.initialize_mesh_data(points, faces);		//create internal
   clock_t end = clock();
-  cout << "loading model took " << (double)(end - start) / (double)CLOCKS_PER_SEC << " seconds." << endl;
+  fprintf(stderr,  "loading model took %lf seconds" , (double)(end - start) / (double)CLOCKS_PER_SEC );
 
   char buf[1024];
   sprintf(buf,"%s_HY%lf_c%.0lf.binary", input_obj_name.substr(0,input_obj_name.length() - 4 ).c_str(), eps_vg, const_for_theta);
@@ -765,7 +765,7 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
       _index ++;
       //printf("v %d dis %lf\n" , d.first, d.second);
       //if (fabs(dis - d.second) > 1e-6) {
-      //  printf("dis %lf origin %lf\n", dis, d.second);
+      //  fprintf(stderr,"dis %lf origin %lf\n", dis, d.second);
       //}
       dests.push_back(make_pair(d.first,d.second));
     }
@@ -856,18 +856,18 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
               double b = (model.Vert(v0) - p_cpoint3d).Len();
               angle = sum_angle[j] + acos((l * l + r * r - b * b) / (2 * l * r));
             }else{
-              printf("fuck error line 680\n");
+              fprintf(stderr,"fuck error line 680\n");
             }
             flag = true;
             break;
           }
         }
         if (!flag) {
-          printf("flag %d\n" , flag);
+          fprintf(stderr,"flag %d\n" , flag);
         }
 
       } else{
-        printf("fuck error face\n");
+        fprintf(stderr,"fuck error face\n");
       }
     
       angles[i] = angle;
@@ -882,7 +882,7 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
     }
     sort(body_parts_with_angle.begin(), body_parts_with_angle.end());
     //for (auto& b:body_parts_with_angle) {
-    //  printf("b %lf " , b.angle);
+    //  fprintf(stderr,"b %lf " , b.angle);
     //}
     //printf("\n");
     float angle_sum = model.AngleSum(source_index);
@@ -895,7 +895,7 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
     }
     //if (source_index == 0) {
     //  for (auto& p:tmp_angles) {
-    //    printf("p %lf " , p);
+    //    fprintf(stderr,"p %lf " , p);
     //  }
     //}
     for (int i = 0; i < body_parts_with_angle.size(); ++i) {//assume i is father
@@ -935,10 +935,10 @@ void svg_precompute_hy(const string& input_obj_name, double eps_vg, string& svg_
 
 void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, string& svg_file_name, double const_for_theta)
 {
-
+  ElapasedTime total_t;
   double theta = asin(sqrt(eps_vg));
   theta *= const_for_theta;
-  printf("******** eps %lf const %lf theta %lf du\n" , eps_vg, const_for_theta, theta  / M_PI * 180.0);
+  fprintf(stderr,"******** eps %lf const %lf theta %lf du\n" , eps_vg, const_for_theta, theta  / M_PI * 180.0);
 
   std::vector<double> points;	
   std::vector<unsigned> faces;
@@ -951,16 +951,16 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
   bool success = geodesic::read_mesh_from_file(input_obj_name.c_str(),points,faces, realIndex, originalVertNum);
   if(!success)
   {
-    cout << "something is wrong with the input file" << endl;
+    fprintf(stderr, "something is wrong with the input file\n" );
     return;
   }
   geodesic::Mesh mesh;
   mesh.initialize_mesh_data(points, faces);		//create internal
   clock_t end = clock();
-  cout << "loading model took " << (double)(end - start) / (double)CLOCKS_PER_SEC << " seconds." << endl;
+  fprintf(stderr, "loading model took %.2lf secodns\n" , (double)(end - start) / (double)CLOCKS_PER_SEC);;
 
   char buf[1024];
-  sprintf(buf,"%s_HY%lf_c%.0lf.binary", input_obj_name.substr(0,input_obj_name.length() - 4 ).c_str(), eps_vg, const_for_theta);
+  sprintf(buf,"%s_DGG%lf_c%.0lf.binary", input_obj_name.substr(0,input_obj_name.length() - 4 ).c_str(), eps_vg, const_for_theta);
   svg_file_name = string(buf);
   //svg_file_name = input_obj_name.substr(0,input_obj_name.length() - 4 ) 
   //  + "_HY" + to_string(eps_vg) +  ".binary";
@@ -978,6 +978,11 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
   double dis_time_total(0);
   double past_time(0);
   //end_vertex_index = 0;
+
+  double t_propagate=0;
+  double t_backtrace=0;
+  double t_sort=0;
+  double t_write = 0;
 
   for (int tmp_source = begin_vertex_index;tmp_source <= end_vertex_index;++tmp_source) {
 
@@ -999,6 +1004,8 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
       sources.push_back(geodesic::SurfacePoint(&mesh.vertices()[srcs[i]]));
     }
 
+    ElapasedTime tm_propagate;
+
     geodesic::GeodesicAlgorithmBase *algorithm;
 
     algorithm = new geodesic::GeodesicAlgorithmVGMMP(&mesh); 
@@ -1011,7 +1018,9 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
     map<int,double> fixedDests;
     algorithm->propagate_vg(sources, eps_vg, fixedDests);
 
+    t_propagate += tm_propagate.getTime();
 
+    ElapasedTime tm_backtrace;
 
     vector<pair<int,double>> dests;
 
@@ -1038,17 +1047,20 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
       _index ++;
       //printf("v %d dis %lf\n" , d.first, d.second);
       //if (fabs(dis - d.second) > 1e-6) {
-      //  printf("dis %lf origin %lf\n", dis, d.second);
+      //  fprintf(stderr,"dis %lf origin %lf\n", dis, d.second);
       //}
       dests.push_back(make_pair(d.first,d.second));
     }
+
+    t_backtrace += tm_backtrace.getTime();
+    ElapasedTime tm_sort;
 
     std::sort(covered_points.begin(), covered_points.end());
     std::map<int, int> mp;
     for(int i = 0; i < covered_points.size(); ++i){
       mp[covered_points[i].id] = i;
     }
-    BodyHeadOfSVG body_header(source_index , dests.size());
+    BodyHeadOfSVG body_header(source_index , dests.size());  
     output_file.write((char*)&body_header , sizeof(body_header));
 
     vector<BodyPartOfSVGWithK> body_parts(dests.size());
@@ -1129,18 +1141,18 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
               double b = (model.Vert(v0) - p_cpoint3d).Len();
               angle = sum_angle[j] + acos((l * l + r * r - b * b) / (2 * l * r));
             }else{
-              printf("fuck error line 680\n");
+              fprintf(stderr,"fuck error line 680\n");
             }
             flag = true;
             break;
           }
         }
         if (!flag) {
-          printf("flag %d\n" , flag);
+          fprintf(stderr,"flag %d\n" , flag);
         }
 
       } else{
-        printf("fuck error face\n");
+        fprintf(stderr,"fuck error face\n");
       }
     
       angles[i] = angle;
@@ -1155,7 +1167,7 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
     }
     sort(body_parts_with_angle.begin(), body_parts_with_angle.end());
     //for (auto& b:body_parts_with_angle) {
-    //  printf("b %lf " , b.angle);
+    //  fprintf(stderr,"b %lf " , b.angle);
     //}
     //printf("\n");
     float angle_sum = model.AngleSum(source_index);
@@ -1168,7 +1180,7 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
     }
     //if (source_index == 0) {
     //  for (auto& p:tmp_angles) {
-    //    printf("p %lf " , p);
+    //    fprintf(stderr,"p %lf " , p);
     //  }
     //}
     for (int i = 0; i < body_parts_with_angle.size(); ++i) {//assume i is father
@@ -1185,12 +1197,16 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
       int start_pos = lower_bound(tmp_angles.begin(),tmp_angles.end(),start_angle) - tmp_angles.begin();
       if (start_pos > 0) start_pos--;
       int end_pos = lower_bound(tmp_angles.begin(), tmp_angles.end(), end_angle) - tmp_angles.begin();
-      //printf("start_angle %lf start_pos_angle %lf end_angle  %lf end_pos_angle %lf\n" , start_angle, tmp_angles[start_pos], end_angle, tmp_angles[end_pos]);
+      //if (source_index == 0 ) {
+      //  fprintf(stderr,"dest %d dis %lf start_angle %lf start_pos_angle %lf end_angle  %lf end_pos_angle %lf\n" , body_parts_with_angle[i].dest_index, body_parts_with_angle[i].dest_dis,start_angle, tmp_angles[start_pos], end_angle, tmp_angles[end_pos]);
+      //}
       if (start_pos >= body_parts_with_angle.size()) start_pos -= body_parts_with_angle.size();
       if (end_pos >= body_parts_with_angle.size()) end_pos -= body_parts_with_angle.size();
       body_parts_with_angle[i].begin_pos = start_pos;
       body_parts_with_angle[i].end_pos = end_pos;
     }
+
+    t_sort += tm_sort.getTime();
     for (auto& b:body_parts_with_angle) {
       output_file.write((char*)&b , sizeof(b));    
     }
@@ -1208,19 +1224,23 @@ void svg_precompute_hy_pruning(const string& input_obj_name, double eps_vg, stri
   double prune_time;
   JIAJUN_DGG_PRUNING::dgg_pruning(svg_file_name, eps_vg, output_filename, prune_time);
 
-  time_once.printTime("time_past ");
+  //time_once.printTime("time_past ");
+  //total_t.printTime("total_time ");
+  fprintf(stderr,"propagate time %lf precent %lf%%\n" , t_propagate , t_propagate / t * 100.0);
+  fprintf(stderr,"backtrace time %lf percent %lf%%\n" , t_backtrace, t_backtrace / t * 100.0);
+  fprintf(stderr,"sort time %lf percent %lf%%\n" , t_sort, t_sort / t * 100.0);
 
-  printf("total_time_and_pruning %lf\n" , t + prune_time);
+  fprintf(stderr,"prunning time %lf\n" , prune_time);
+  fprintf(stderr,"total_time_and_pruning %lf\n" , t + prune_time);
 
 }
 
 
-void svg_precompute_hy_fast(const string& input_obj_name, double eps_vg, string& svg_file_name, double const_for_theta)
+void svg_precompute_hy_new(const string& input_obj_name, double eps_vg, string& svg_file_name, double const_for_theta)
 {
-
   double theta = asin(sqrt(eps_vg));
   theta *= const_for_theta;
-  printf("******** eps %lf const %lf theta %lf du\n" , eps_vg, const_for_theta, theta  / M_PI * 180.0);
+  fprintf(stderr,"******** eps %lf const %lf theta %lf du\n" , eps_vg, const_for_theta, theta  / M_PI * 180.0);
 
   std::vector<double> points;	
   std::vector<unsigned> faces;
@@ -1233,27 +1253,24 @@ void svg_precompute_hy_fast(const string& input_obj_name, double eps_vg, string&
   bool success = geodesic::read_mesh_from_file(input_obj_name.c_str(),points,faces, realIndex, originalVertNum);
   if(!success)
   {
-    cout << "something is wrong with the input file" << endl;
+    fprintf(stderr,"something is wrong with the input file\n");;
     return;
   }
   geodesic::Mesh mesh;
   mesh.initialize_mesh_data(points, faces);		//create internal
   clock_t end = clock();
-  cout << "loading model took " << (double)(end - start) / (double)CLOCKS_PER_SEC << " seconds." << endl;
+  fprintf(stderr, "loading model took %lf seconds" , (double)(end - start) / (double)CLOCKS_PER_SEC );
 
   char buf[1024];
-  sprintf(buf,"%s_HY%lf_c%.0lf.binary", input_obj_name.substr(0,input_obj_name.length() - 4 ).c_str(), eps_vg, const_for_theta);
+  sprintf(buf,"%s_DGG%lf_c%.0lf.binary", input_obj_name.substr(0,input_obj_name.length() - 4 ).c_str(), eps_vg, const_for_theta);
   svg_file_name = string(buf);
   //svg_file_name = input_obj_name.substr(0,input_obj_name.length() - 4 ) 
   //  + "_HY" + to_string(eps_vg) +  ".binary";
 
-  int begin_vertex_index = 0;
 
-  int end_vertex_index = points.size() / 3 - 1;
-
+  int num_of_vertex = points.size() / 3;
   ofstream output_file (svg_file_name.c_str() , ios::out | ios::binary);
-  int num_of_vertex = end_vertex_index - begin_vertex_index + 1;
-  HeadOfSVG head_of_svg(begin_vertex_index , end_vertex_index , num_of_vertex );     
+  HeadOfSVG head_of_svg(0 , num_of_vertex - 1 , num_of_vertex );     
   output_file.write((char*)&head_of_svg , sizeof(head_of_svg));
   ElapasedTime time_once;
 
@@ -1261,12 +1278,12 @@ void svg_precompute_hy_fast(const string& input_obj_name, double eps_vg, string&
   double past_time(0);
   //end_vertex_index = 0;
 
-  for (int tmp_source = begin_vertex_index;tmp_source <= end_vertex_index;++tmp_source) {
-
+  vector<vector<SVGEdgeWithAngle>> graph_with_angle(num_of_vertex);
+  for (int tmp_source = 0;tmp_source < num_of_vertex;++tmp_source) {
     if (time_once.getTime() -  past_time > 5 ) {
       past_time = time_once.getTime();
       char buf[128];
-      sprintf(buf, "Computed %.0lf percent", (double) tmp_source  * 100. / (end_vertex_index - begin_vertex_index));
+      sprintf(buf, "Computed %.0lf percent", (double) tmp_source  * 100. / num_of_vertex);
       time_once.printTime(buf );
     }
     ElapasedTime dis_time;
@@ -1294,207 +1311,90 @@ void svg_precompute_hy_fast(const string& input_obj_name, double eps_vg, string&
     map<int,double> fixedDests;
     algorithm->propagate_vg(sources, eps_vg, fixedDests);
 
-    vector<pair<int,double>> dests;
-
-    struct node {
-      int id;
-      double dis;
-      int operator<(const node & other) const{
-        return dis < other.dis;
-      }
-    };
-
-    //printf("tmp_source %d dest size %d\n" , tmp_source, fixedDests.size());
-    vector<node> covered_points;
-    covered_points.resize(fixedDests.size());
-    int _index = 0;
-    for (auto& d:fixedDests) {
+    for (auto& d:fixedDests) {//d.first is dest vertex
       geodesic::SurfacePoint dest_p = geodesic::SurfacePoint(&mesh.vertices()[d.first]);
       double dis;
-      if (source_index == 0) {
-        printf("___________________dest_p %d\n" , d.first);
+      double angle;
+      algorithm->best_source_with_angle(dest_p, dis,angle);
+      if (d.first != source_index) {
+        graph_with_angle[d.first].push_back(SVGEdgeWithAngle(source_index,dis,angle));      
       }
-      algorithm->best_source(dest_p, dis);
-      covered_points[_index].id = d.first;
-      covered_points[_index].dis = d.second;
-      _index ++;
-      dests.push_back(make_pair(d.first,d.second));
-    }
-
-    std::sort(covered_points.begin(), covered_points.end());
-    std::map<int, int> mp;
-    for(int i = 0; i < covered_points.size(); ++i){
-      mp[covered_points[i].id] = i;
-    }
-    BodyHeadOfSVG body_header(source_index , dests.size());
-    output_file.write((char*)&body_header , sizeof(body_header));
-
-    vector<BodyPartOfSVGWithK> body_parts(dests.size());
-    for(int i = 0; i < dests.size(); ++i) {
-      BodyPartOfSVGWithK body_part(dests[i].first , dests[i].second , mp[dests[i].first]);
-      //BodyPartOfSVGWithK body_part(dests[i].first , dests[i].second , i);
-      body_parts[i] = body_part;
-    }
-    sort(body_parts.begin() , body_parts.end());
-
-    vector<double> angles(body_parts.size());
-    for (int i = 0; i < body_parts.size(); ++i) {
-      //double distance;
-      //auto p(geodesic::SurfacePoint(&mesh.vertices()[body_parts[i].dest_index]));
-      //unsigned best_source = algorithm->best_source(p, distance);	
-      auto dest_vert(geodesic::SurfacePoint(&mesh.vertices()[body_parts[i].dest_index]));
-      vector<geodesic::SurfacePoint> path; 
-      
-      algorithm->trace_back(dest_vert, path);
-      geodesic::SurfacePoint p;
-      if (path.size() > 1) {
-        p = *(path.rbegin()+1);
-      } else {
-        p = (path[0]);
-      }
- //         VERTEX,
- //   EDGE,
- //   FACE,
-	//UNDEFINED_POINT
-      auto& neighs = model.Neigh(source_index);
-      auto& sum_angle = model.NeighAngleSum(source_index);
-      //vector<double> sum_angle(neighs.size()+1);
-      //sum_angle[0] = 0;
-      //for (int j = 1; j <= neighs.size(); ++j) {
-      //  sum_angle[j] = sum_angle[j-1] + neighs[j-1].second;
+      //if (source_index == 10) {
+      //  fprintf(stderr,"source %d dest %d dis %lf angle %lf\n" , source_index, d.first, d.second, angle);
       //}
+      //if (d.first == 10) {
+      //  fprintf(stderr,"source %d dest %d dis %lf angle %lf\n" , source_index, d.first, d.second, angle);
+      //}
+    }
+    delete algorithm;
+    algorithm = NULL;
+  }
 
-      double angle = 0;
-      if ( p.type() == geodesic::VERTEX) {
-        //printf("vertex\n");
-        bool flag_found = false;
-        for (int j = 0; j < neighs.size(); ++j) {
-          auto& neigh = neighs[j];
-          if ( p.base_element()->id() == model.Edge(neigh.first).indexOfRightVert) {
-            //printf("yes\n");
-            flag_found = true;
-            angle = sum_angle[j];
-            break;
-          }
-        }
-        if (!flag_found) {
-          angle = 0;
-          //printf("vertex %d source %d\n" , p.base_element()->id(), source_index);
-        }
+  for (int source_index = 0; source_index < num_of_vertex; ++source_index) {
 
-      } else if(p.type() == geodesic::EDGE) {
-        
-        //printf("edge\n");
-        int v0 = p.base_element()->adjacent_vertices()[0]->id();
-        int v1 = p.base_element()->adjacent_vertices()[1]->id();
-        bool flag = false;
-        for (int j = 0; j < neighs.size(); ++j) {
-          auto& neigh = neighs[j];
-          if (v0 == model.Edge(neigh.first).indexOfRightVert) {
-            int jminus1 = (j-1+neighs.size())%neighs.size();
-            int vjminus1 = model.Edge(neighs[jminus1].first).indexOfRightVert;
-            int jplus1 = (j+1)%neighs.size();
-            int vjplus1 = model.Edge(neighs[jplus1].first).indexOfRightVert;
-            //printf("v1 %d j -1 %d j + 1 %d\n" , v1, vjminus1, vjplus1); 
-            CPoint3D p_cpoint3d(p.x(),p.y(),p.z());
-            
-            if (v1 == vjminus1) {//v1 first
-              double l = model.Edge(neighs[jminus1].first).length;
-              double r = (model.Vert(source_index) - p_cpoint3d).Len();
-              double b = (model.Vert(vjminus1) - p_cpoint3d).Len();
-              angle = sum_angle[jminus1] + acos((l * l + r * r - b * b) / (2 * l * r));
-            } else if (v1 == vjplus1) {//v0 first
-              double l = model.Edge(neighs[j].first).length;
-              double r = (model.Vert(source_index) - p_cpoint3d).Len();
-              double b = (model.Vert(v0) - p_cpoint3d).Len();
-              angle = sum_angle[j] + acos((l * l + r * r - b * b) / (2 * l * r));
-            }else{
-              //printf("fuck error line 680\n");
-            }
-            flag = true;
-            break;
-          }
-        }
-        if (!flag) {
-          printf("flag %d\n" , flag);
-        }
-
-      } else{
-        //printf("fuck error face\n");
-      }
-    
-      angles[i] = angle;
-
-      if ( body_parts[i].dest_index == 0) {
-        printf("************* source_index %d dest %d angle %lf\n" , source_index, body_parts[i].dest_index, angle);
-      }
+    //vector<BodyPartOfSVGWithAngle> body_parts_with_angle(body_parts.size());
+    auto& graph_body_part = graph_with_angle[source_index];
+    sort(graph_body_part.begin(), graph_body_part.end());
+    int neigh_size = graph_body_part.size();
+    vector<BodyPartOfSVGWithRange> body_parts_with_range(neigh_size);
+    for (int i = 0; i < neigh_size; ++i) {
+      body_parts_with_range[i] = BodyPartOfSVGWithRange(graph_body_part[i].dest_index,graph_body_part[i].dest_dis,-1,-1);
     }
 
-    vector<BodyPartOfSVGWithAngle> body_parts_with_angle(body_parts.size());
-    for (int i = 0; i < body_parts.size(); ++i) {
-      BodyPartOfSVG b = body_parts[i];
-      BodyPartOfSVGWithAngle b_with_angle(b.dest_index, b.dest_dis, angles[i],0,0);
-      body_parts_with_angle[i] = b_with_angle;
-      //output_file.write( (char*)&b_with_angle , sizeof(b_with_angle));
-    }
-    sort(body_parts_with_angle.begin(), body_parts_with_angle.end());
-    //for (auto& b:body_parts_with_angle) {
-    //  printf("b %lf " , b.angle);
-    //}
-    //printf("\n");
+
     float angle_sum = model.AngleSum(source_index);
-    vector<double> tmp_angles(body_parts_with_angle.size()*2);
-    for (int i = 0; i < body_parts_with_angle.size(); ++i) {
-      tmp_angles[i] = body_parts_with_angle[i].angle;
+    vector<double> tmp_angles(neigh_size*2);
+    for (int i = 0; i < neigh_size; ++i) {
+      tmp_angles[i] = graph_body_part[i].angle;
     }
-    for (int i = body_parts_with_angle.size(); i < tmp_angles.size(); ++i) {
-      tmp_angles[i] = body_parts_with_angle[i-body_parts_with_angle.size()].angle + angle_sum;
+    for (int i = neigh_size; i < tmp_angles.size(); ++i) {
+      tmp_angles[i] = graph_body_part[i-neigh_size].angle + angle_sum;
     }
-    //if (source_index == 0) {
-    //  for (auto& p:tmp_angles) {
-    //    printf("p %lf " , p);
-    //  }
-    //}
-    for (int i = 0; i < body_parts_with_angle.size(); ++i) {//assume i is father
-      float father_angle = body_parts_with_angle[i].angle;
+    for (int i = 0; i < graph_body_part.size(); ++i) {//assume i is father
+      float father_angle = graph_body_part[i].angle;
       //based on father_angle as 0
       float start_angle = M_PI - theta + father_angle;
       float end_angle = angle_sum - (M_PI - theta) + father_angle;
       if (start_angle > end_angle) {
-        body_parts_with_angle[i].begin_pos = -1;
-        body_parts_with_angle[i].end_pos = -1;
+        body_parts_with_range[i].begin_pos = -1;
+        body_parts_with_range[i].end_pos = -1;
         continue;
       }
 
       int start_pos = lower_bound(tmp_angles.begin(),tmp_angles.end(),start_angle) - tmp_angles.begin();
       if (start_pos > 0) start_pos--;
       int end_pos = lower_bound(tmp_angles.begin(), tmp_angles.end(), end_angle) - tmp_angles.begin();
-      //printf("start_angle %lf start_pos_angle %lf end_angle  %lf end_pos_angle %lf\n" , start_angle, tmp_angles[start_pos], end_angle, tmp_angles[end_pos]);
-      if (start_pos >= body_parts_with_angle.size()) start_pos -= body_parts_with_angle.size();
-      if (end_pos >= body_parts_with_angle.size()) end_pos -= body_parts_with_angle.size();
-      body_parts_with_angle[i].begin_pos = start_pos;
-      body_parts_with_angle[i].end_pos = end_pos;
+      //if (source_index == 0) {
+      //  fprintf(stderr,"dest %d dis %lf start_angle %lf start_pos_angle %lf end_angle  %lf end_pos_angle %lf\n" ,body_parts_with_range[i].dest_index , body_parts_with_range[i].dest_dis,  start_angle, tmp_angles[start_pos], end_angle, tmp_angles[end_pos]);
+      //}
+      if (start_pos >= neigh_size) start_pos -= neigh_size;
+      if (end_pos >= neigh_size) end_pos -= neigh_size;
+      body_parts_with_range[i].begin_pos = start_pos;
+      body_parts_with_range[i].end_pos = end_pos;
     }
-    for (auto& b:body_parts_with_angle) {
+    BodyHeadOfSVG body_header(source_index , neigh_size);  
+    output_file.write((char*)&body_header , sizeof(body_header));
+
+    for (auto& b:body_parts_with_range) {
       output_file.write((char*)&b , sizeof(b));    
     }
 
-    delete algorithm;
-    algorithm = NULL;
   }
-
   double t = time_once.getTime();
-
   output_file.close();
+}
 
-
+void svg_precompute_hy_fast(const string& input_obj_name, double eps_vg, string& svg_file_name, double const_for_theta)
+{
+  ElapasedTime t;
+  svg_precompute_hy_new(input_obj_name,eps_vg,svg_file_name, const_for_theta);
   string output_filename;
   double prune_time;
-  JIAJUN_DGG_PRUNING::dgg_pruning(svg_file_name, eps_vg, output_filename, prune_time);
+  JIAJUN_DGG_PRUNING::dgg_pruning_new(svg_file_name, eps_vg, output_filename, prune_time);
 
-  time_once.printTime("time_past ");
+  t.printTime("time_past ");
 
-  printf("total_time_and_pruning %lf\n" , t + prune_time);
+ // fprintf(stderr,"total_time_and_pruning %lf\n" , t + prune_time);
 
 
 

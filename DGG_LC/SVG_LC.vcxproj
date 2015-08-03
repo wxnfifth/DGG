@@ -21,16 +21,24 @@
   <ItemGroup>
     <ClCompile Include="..\src\DGG_LC\dgg_lc.cpp" />
     <ClCompile Include="..\src\ICH\BaseModel.cpp" />
+    <ClCompile Include="..\src\ICH\ExactMethodForDGP.cpp" />
     <ClCompile Include="..\src\ICH\Geometry.cpp" />
+    <ClCompile Include="..\src\ICH\ICHWithFurtherPriorityQueue.cpp" />
+    <ClCompile Include="..\src\ICH\ImprovedCHWithEdgeValve.cpp" />
     <ClCompile Include="..\src\ICH\Point3D.cpp" />
+    <ClCompile Include="..\src\ICH\PreviousCH.cpp" />
     <ClCompile Include="..\src\ICH\RichModel.cpp" />
     <ClCompile Include="..\src\WXN\wxnMath.cpp" />
     <ClCompile Include="..\src\WXN\wxn_geometry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ICH\BaseModel.h" />
+    <ClInclude Include="..\src\ICH\ExactMethodForDGP.h" />
     <ClInclude Include="..\src\ICH\Geometry.h" />
+    <ClInclude Include="..\src\ICH\ICHWithFurtherPriorityQueue.h" />
+    <ClInclude Include="..\src\ICH\ImprovedCHWithEdgeValve.h" />
     <ClInclude Include="..\src\ICH\Point3D.h" />
+    <ClInclude Include="..\src\ICH\PreviousCH.h" />
     <ClInclude Include="..\src\ICH\RichModel.h" />
     <ClInclude Include="..\src\svg_definition.h" />
     <ClInclude Include="..\src\WXN\wxnMath.h" />
@@ -150,7 +158,7 @@
       <AdditionalDependencies>glut64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\x64\Release\dgg_lc.exe c:\util\</Command>
+      <Command>copy ..\x64\Release\dgg_lc.exe ..\..\bin</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

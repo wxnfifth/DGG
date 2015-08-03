@@ -10,6 +10,9 @@
     <Filter Include="Model">
       <UniqueIdentifier>{28e175ac-26c0-499f-8871-16b46cd9c2dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ICH">
+      <UniqueIdentifier>{8ac90dd1-73d4-44fa-854f-e0e407cd5c1a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DGG_LC\dgg_lc.cpp">
@@ -32,6 +35,18 @@
     </ClCompile>
     <ClCompile Include="..\src\ICH\Point3D.cpp">
       <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ICH\ICHWithFurtherPriorityQueue.cpp">
+      <Filter>ICH</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ICH\ImprovedCHWithEdgeValve.cpp">
+      <Filter>ICH</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ICH\PreviousCH.cpp">
+      <Filter>ICH</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ICH\ExactMethodForDGP.cpp">
+      <Filter>ICH</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +76,18 @@
     </ClInclude>
     <ClInclude Include="..\src\svg_definition.h">
       <Filter>DGG_LC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ICH\ICHWithFurtherPriorityQueue.h">
+      <Filter>ICH</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ICH\ImprovedCHWithEdgeValve.h">
+      <Filter>ICH</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ICH\PreviousCH.h">
+      <Filter>ICH</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ICH\ExactMethodForDGP.h">
+      <Filter>ICH</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

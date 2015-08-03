@@ -166,7 +166,7 @@ void CBaseModel::AdjustScaleAndComputeNormalsToVerts()
 		}
 	}
 	center /= sumArea * 3;
-    printf("center %lf %lf %lf\n" , center.x , center.y , center.z );
+    fprintf(stderr,"center %lf %lf %lf\n" , center.x , center.y , center.z );
 	deta -= 3 * (center ^ sumNormal);
 	if (true)//deta > 0)
 	{

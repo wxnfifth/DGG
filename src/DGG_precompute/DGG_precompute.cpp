@@ -28,8 +28,11 @@ int main(int argc, char** argv)
       if (argc == 5) {
         const_for_theta = atoi(argv[4]);
       } else {
-        printf("wrong argument, usage example 'SVG_precompute.exe bunny.obj 50  h(hy's method) 10(const num)");
-        exit(1);
+        //printf("wrong argument, usage example 'SVG_precompute.exe bunny.obj 50  h(hy's method) 10(const num)");
+        //exit(1);
+        double theta = asin(sqrt(eps_vg)) / M_PI * 180;
+        double const_for_theta = 30.0 / theta;
+        fprintf(stderr,"set default theta to 30 du\n");
       }
     } else if (method == "n") {
       input_file_name = argv[1];
@@ -37,11 +40,11 @@ int main(int argc, char** argv)
       method = argv[3];
     } 
   } else {
-    printf("wrong argument, usage example 'SVG_precompute.exe bunny.obj 50 [n(normal) f(fix_neighbor) j(jiajun's method)' y(jiajun's method and jiajun's output) h(hy's method) p(hy's method with prunning) d(dgg's method with prunning and fast)");
+    fprintf(stderr,"wrong argument, usage example 'SVG_precompute.exe bunny.obj 50 [n(normal) f(fix_neighbor) j(jiajun's method)' y(jiajun's method and jiajun's output) h(hy's method) p(hy's method with prunning) d(dgg's method with prunning and fast)");
     exit(1);
   }
 
-  string svg_file_name;
+  string svg_file_name;            
   if (method == "n") {
     svg_precompute(input_file_name, fixed_K, svg_file_name);
   } else if (method == "f") {
@@ -53,7 +56,7 @@ int main(int argc, char** argv)
   } else if (method == "y") {
     svg_precompute_jiajun_output(input_file_name, eps_vg, svg_file_name);
   } else if (method == "h") {
-    svg_precompute_hy(input_file_name, eps_vg, svg_file_name, const_for_theta);
+    svg_precompute_hy(input_file_name, eps_vg, svg_file_name, const_for_theta);    
   } else if (method == "p") {
     svg_precompute_hy_pruning(input_file_name, eps_vg, svg_file_name, const_for_theta);
   } else if (method == "d") {

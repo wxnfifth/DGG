@@ -380,7 +380,7 @@ void CRichModel::ReadColorFile(const string& clr_file_name)
             b = 0;
             m_vertex_colors[i] = CPoint3D(r/255.0,g/255.0,b/255.0);
             if( i < 10 ){
-                printf("%lf %lf %lf\n" , r/255.0,0,0);
+                fprintf(stderr,"%lf %lf %lf\n" , r/255.0,0,0);
             }
         }else{
             assert(false);

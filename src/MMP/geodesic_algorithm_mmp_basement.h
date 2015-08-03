@@ -33,6 +33,7 @@ public:
 	void trace_back(SurfacePoint& destination, std::vector<SurfacePoint>& path);
 
 	unsigned best_source(SurfacePoint& point, double& best_source_distance);
+	unsigned best_source_with_angle(SurfacePoint& point, double& best_source_distance, double& angle);
 
 	void print_statistics();
 
@@ -83,6 +84,14 @@ protected:
 		double& best_total_distance, 
 		double& best_interval_position,
 		unsigned& best_source_index);
+
+  interval_pointer best_first_interval_with_angle(SurfacePoint& point, 
+		double& best_total_distance, 
+		double& best_interval_position,
+		unsigned& best_source_index,
+    double& best_first_interval_with_angle);
+
+  
 
 	long visible_from_source(SurfacePoint& point);	//used in backtracing
 
@@ -654,6 +663,23 @@ inline void GeodesicAlgorithmMMPBasement::construct_propagated_intervals(bool in
 	}
 }
 
+inline unsigned GeodesicAlgorithmMMPBasement::best_source_with_angle(SurfacePoint& point,			//quickly find what source this point belongs to and what is the distance to this source
+	double& best_source_distance,
+  double& angle)
+{
+	double best_interval_position; 
+	unsigned best_source_index;
+
+	best_first_interval_with_angle(point, 
+		best_source_distance, 
+		best_interval_position, 
+		best_source_index,
+    angle);
+
+	return best_source_index;
+} 
+
+
 inline unsigned GeodesicAlgorithmMMPBasement::best_source(SurfacePoint& point,			//quickly find what source this point belongs to and what is the distance to this source
 	double& best_source_distance)
 {
@@ -708,7 +734,6 @@ inline void GeodesicAlgorithmMMPBasement::trace_back(SurfacePoint& destination,	
 				total_distance,
 				position);
 
-			//std::cout << total_distance + length(path) << std::endl;
 			assert(total_distance<GEODESIC_INF);
 			source_index = interval->source_index();
 
@@ -831,23 +856,127 @@ inline interval_pointer GeodesicAlgorithmMMPBasement::best_first_interval(Surfac
         }
 			}
 		}
-    double angle = 0;
+  }
+
+	//if(best_total_distance > m_propagation_distance_stopped)		//result is unreliable
+	//{
+	//	best_total_distance = GEODESIC_INF;
+	//	return NULL;
+	//}
+	//else
+	//{
+		return best_interval;
+	//}
+}
+
+
+inline interval_pointer GeodesicAlgorithmMMPBasement::best_first_interval_with_angle(SurfacePoint& point, 
+	double& best_total_distance, 
+	double& best_interval_position, 
+	unsigned& best_source_index,
+  double& angle)
+{
+	assert(point.type() != UNDEFINED_POINT);
+
+	interval_pointer best_interval = NULL;	
+	best_total_distance = GEODESIC_INF;
+
+	if(point.type() == EDGE)		
+	{
+		edge_pointer e = static_cast<edge_pointer>(point.base_element());
+		list_pointer list = interval_list(e);
+
+		best_interval_position = point.distance(e->v0());
+		best_interval = list->covering_interval(best_interval_position);
+		if(best_interval)
+		{
+			//assert(best_interval && best_interval->d() < GEODESIC_INF);
+			best_total_distance = best_interval->signal(best_interval_position);
+			best_source_index = best_interval->source_index();
+		}
+	}
+	else if(point.type() == FACE)		
+	{
+		face_pointer f = static_cast<face_pointer>(point.base_element());
+		for(unsigned i=0; i<3; ++i)
+		{
+			edge_pointer e = f->adjacent_edges()[i];
+			list_pointer list = interval_list(e);
+
+			double offset;
+			double distance;
+			interval_pointer interval;
+
+			list->find_closest_point(&point, 
+				offset, 
+				distance, 
+				interval);
+
+			if(interval && distance < best_total_distance)
+			{
+				best_interval = interval;
+				best_total_distance = distance;
+				best_interval_position = offset;
+				best_source_index = interval->source_index();
+			}
+		}
+
+		//check for all sources that might be located inside this face
+		SortedSources::sorted_iterator_pair local_sources = m_sources.sources(f);
+		for(SortedSources::sorted_iterator it=local_sources.first; it != local_sources.second; ++it)
+		{
+			SurfacePointWithIndex* source = *it;
+			double distance = point.distance(source);
+			if(distance < best_total_distance)
+			{
+				best_interval = NULL;
+				best_total_distance = distance;
+				best_interval_position = 0.0;
+				best_source_index = source->index();
+			}
+		}
+	}
+	else if(point.type() == VERTEX)		
+	{
+		vertex_pointer v = static_cast<vertex_pointer>(point.base_element());
+    //interval_pointer best_interval = NULL;
+    //best_interal = NULL;
+    edge_pointer best_e = NULL;
+		for(unsigned i=0; i<v->adjacent_edges().size(); ++i)
+		{
+			edge_pointer e = v->adjacent_edges()[i];
+      //printf("v %d e(v0) %d e(v1) %d " , v->id(), e->v0()->id(), e->v1()->id());
+			list_pointer list = interval_list(e);
+
+			double position = e->v0()->id() == v->id() ? 0.0 : e->length();
+			interval_pointer interval = list->covering_interval(position);
+			if(interval)
+			{
+				double distance = interval->signal(position);
+
+				if(distance < best_total_distance)
+				{
+					best_interval = interval;
+					best_total_distance = distance;
+					best_interval_position = position;
+					best_source_index = interval->source_index();
+				  best_interval = interval;
+          best_e = e;
+        }
+			}
+		}
+    //double angle = 0;
+    angle = 0;
     if (best_interval != NULL) {
-      // printf("best_source_index %d\n" , best_source_index);
-      if (m_sources[best_source_index].base_element()->id() == 0) {
-        printf("v__________________________ \n");
-
+      //if (m_sources[best_source_index].base_element()->id() == 0) {
+      if (true) {
         if (best_e->v1()->id() == v->id()) {
-
-          printf("$$$$$$$$$$$$$$$$$$$$$ start %lf stop %lf len %lf\n" , best_interval->start(), best_interval->stop(), best_e->length()  );
-          
           face_pointer f = NULL;
           if ( best_interval->direction() == Interval::FROM_FACE_0) {
             f = best_e->adjacent_faces()[0];
           }else if (best_interval->direction() == Interval::FROM_FACE_1) {
             f = best_e->adjacent_faces()[1];
           }else if (best_interval->direction() == Interval::FROM_SOURCE) {
-            printf("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& from source \n");
             auto& neighs = model_ptr_->Neigh(v->id());
             auto v_1 = best_e->v0();
             double angle;
@@ -858,22 +987,15 @@ inline interval_pointer GeodesicAlgorithmMMPBasement::best_first_interval(Surfac
                 break;
               }
             }
-            printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
           }
           if (f != NULL) {
-            //printf("from_face_0\n");
             vertex_pointer v_b = f->opposite_vertex(best_e);
             vertex_pointer v_0 = best_e->v1();
             vertex_pointer v_1 = best_e->v0();
-            printf("v0 %d v1 %d v2 %d\n" , f->adjacent_vertices()[0]->id(), f->adjacent_vertices()[1]->id(),f->adjacent_vertices()[2]->id());
-            printf("now_v0 %d  now_vb %d now_v1 %d\n" , v_0->id(), v_1->id(), v_b->id());
-            //printf("angle %lf %lf \n" , angle_of_v0, f->vertex_angle(v_0));
-            //printf("start %lf stop %lf\n" , best_interval->start(), best_interval->stop());
             double len_interval = fabs(best_interval->stop() - best_interval->start());
             double len_start = best_interval->signal(best_interval->start());
             double len_stop = best_interval->signal(best_interval->stop());
             double angle_interval = angle_from_edges(len_start,len_stop,len_interval);
-            printf("angle_tri %lf angle_interval %lf\n" ,  f->vertex_angle(v_0) / PI * 180, angle_interval / PI * 180);
             auto& neighs = model_ptr_->Neigh(v->id());
             for (int j = 0; j < neighs.size(); ++j) {
               auto& neigh = neighs[j];
@@ -883,37 +1005,29 @@ inline interval_pointer GeodesicAlgorithmMMPBasement::best_first_interval(Surfac
                 int jplus1 = (j+1)%neighs.size();
                 int vjplus1 = model_ptr_->Edge(neighs[jplus1].first).indexOfRightVert;
                 if (v_b->id() == vjminus1) {//vb first ,direction, vb to v1 
-                  //printf("minus \n");
                   angle = model_ptr_->NeighAngleSum(v->id())[j] - angle_interval;
                   if (angle < 0) {
                     angle += model_ptr_->AngleSum(v->id());
                   }
                 }else if(v_b->id() == vjplus1) {//v1 first,direction,v1 to vb
-                  //printf("plus \n");
                   angle = model_ptr_->NeighAngleSum(v->id())[j] + angle_interval;
                   if (angle > model_ptr_->AngleSum(v->id())) {
                     angle -= model_ptr_->AngleSum(v->id());
                   }
                 }else{
-                  printf("line 877_________________________error!\n");
+                  fprintf(stderr,"line 940_________________________error!\n");
                 }
               }
             }
-            printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
+            //printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
           }
-
-        
-        
         } else if (best_e->v0()->id() == v->id()) {
-        
-       
           face_pointer f = NULL;
           if ( best_interval->direction() == Interval::FROM_FACE_0) {
             f = best_e->adjacent_faces()[0];
           }else if (best_interval->direction() == Interval::FROM_FACE_1) {
             f = best_e->adjacent_faces()[1];
           }else if (best_interval->direction() == Interval::FROM_SOURCE) {
-            printf("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& from source \n");
             auto& neighs = model_ptr_->Neigh(v->id());
             auto v_1 = best_e->v1();
             double angle;
@@ -924,22 +1038,17 @@ inline interval_pointer GeodesicAlgorithmMMPBasement::best_first_interval(Surfac
                 break;
               }
             }
-            printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
+            //printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
           }
           if (f != NULL) {
-            //printf("from_face_0\n");
             vertex_pointer v_b = f->opposite_vertex(best_e);
             vertex_pointer v_0 = best_e->v0();
             vertex_pointer v_1 = best_e->v1();
-            printf("v0 %d v1 %d v2 %d\n" , f->adjacent_vertices()[0]->id(), f->adjacent_vertices()[1]->id(),f->adjacent_vertices()[2]->id());
-            printf("now_v0 %d  now_vb %d now_v1 %d\n" , v_0->id(), v_1->id(), v_b->id());
-            //printf("angle %lf %lf \n" , angle_of_v0, f->vertex_angle(v_0));
-            //printf("start %lf stop %lf\n" , best_interval->start(), best_interval->stop());
             double len_interval = fabs(best_interval->stop() - best_interval->start());
             double len_start = best_interval->signal(best_interval->start());
             double len_stop = best_interval->signal(best_interval->stop());
             double angle_interval = angle_from_edges(len_stop,len_start,len_interval);
-            printf("angle_tri %lf angle_interval %lf\n" ,  f->vertex_angle(v_0) / PI * 180, angle_interval / PI * 180);
+            //printf("angle_tri %lf angle_interval %lf\n" ,  f->vertex_angle(v_0) / PI * 180, angle_interval / PI * 180);
             auto& neighs = model_ptr_->Neigh(v->id());
             for (int j = 0; j < neighs.size(); ++j) {
               auto& neigh = neighs[j];
@@ -949,33 +1058,24 @@ inline interval_pointer GeodesicAlgorithmMMPBasement::best_first_interval(Surfac
                 int jplus1 = (j+1)%neighs.size();
                 int vjplus1 = model_ptr_->Edge(neighs[jplus1].first).indexOfRightVert;
                 if (v_b->id() == vjminus1) {//vb first ,direction, vb to v1 
-                  //printf("minus \n");
                   angle = model_ptr_->NeighAngleSum(v->id())[j] - angle_interval;
                   if (angle < 0) {
                     angle += model_ptr_->AngleSum(v->id());
                   }
                 }else if(v_b->id() == vjplus1) {//v1 first,direction,v1 to vb
-                  //printf("plus \n");
                   angle = model_ptr_->NeighAngleSum(v->id())[j] + angle_interval;
                   if (angle > model_ptr_->AngleSum(v->id())) {
                     angle -= model_ptr_->AngleSum(v->id());
                   }
                 }else{
-                  printf("line 877_________________________error!\n");
+                  fprintf(stderr,"line 940_________________________error!\n");
                 }
               }
             }
-            printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
+            //printf("****** dest %d soruce %d angle %lf\n" , v->id(), m_sources[best_source_index].base_element()->id(), angle);
           }
         }
-
-
-      
       }
-
-
-    
-    
     }
 
 

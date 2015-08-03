@@ -27,11 +27,10 @@ namespace JIAJUN_DGG_PRUNING{
   public:
     int v;
     bool deleted;
-    float dis;
-    float angle;
-    int begin_pos;
-    int end_pos;
-    int pos;
+    double dis;
+    short int begin_pos;
+    short int end_pos;
+    short int pos;
     SVGEdge(): deleted(false){}
     //SVGEdge(int node, float distance): v(node), dis(distance), deleted(false){}
     //SVGEdge(int node, float distance, float _angle, int _begin_pos, int _end_pos): v(node), dis(distance), deleted(false), angle(_angle), begin_pos(_begin_pos),end_pos(_end_pos) {}
@@ -98,11 +97,13 @@ namespace JIAJUN_DGG_PRUNING{
     double eps;
     //void read(const char *);
     void readWxnBinary(const char *);
+    void readWxnBinary_new(const char *);
     void dijkstra(int src, double * dis, bool * mark, double);
     void pruning();
     void removeDeletedEdges();
     void write(const char *);
     void writeSVGBinary(const char *);
+    void writeSVGBinary_new(const char *);
   };
 
 
@@ -126,7 +127,7 @@ namespace JIAJUN_DGG_PRUNING{
   //	//system("pause");
   //	for(int i = 0; i < svg.N; ++i){
   //		for(int j = svg.degree[i]; j < svg.degree[i+1]; ++j){
-  //			// printf("%d\w", j);
+  //			// fprintf(stderr,"%d\w", j);
   //			fread(&(svg.edge[j]), sizeof(SVGEdge), 1, fe);
   //
   //		}
@@ -174,7 +175,53 @@ namespace JIAJUN_DGG_PRUNING{
           edge[j].v = body_part.dest_index;
           edge[j].dis = body_part.dest_dis;
           edge[j].deleted = 0;
-          edge[j].angle = body_part.angle;
+          edge[j].begin_pos = body_part.begin_pos;
+          edge[j].end_pos = body_part.end_pos;
+          edge[j].pos = j - degree[i];
+        }
+      }
+    }
+
+
+  }
+  void DGG::readWxnBinary_new(const char* svg_filename)
+  {
+    {
+      std::ifstream input_file (svg_filename, std::ios::in | std::ios::binary);
+      HeadOfSVG head_of_svg;
+      input_file.read( (char*)&head_of_svg , sizeof(head_of_svg));
+      N = head_of_svg.num_of_vertex;
+      origin_neigh_num.resize(N);
+      degree = new int[N+1];
+      degree[0] = 0;
+      for (int i = 0; i < head_of_svg.num_of_vertex; ++i) {
+        BodyHeadOfSVG body_head;
+        input_file.read( (char*)&body_head , sizeof(body_head));
+        origin_neigh_num[i] = body_head.neighbor_num;
+        degree[i+1] = degree[i] + body_head.neighbor_num;
+        for(int j = 0; j < body_head.neighbor_num;++j){ 
+          BodyPartOfSVGWithRange body_part;
+          input_file.read((char*)&body_part , sizeof(body_part));
+        }
+      }
+      input_file.close();
+    }
+    {
+      std::ifstream input_file(svg_filename, std::ios::in | std::ios::binary);
+      edge = new SVGEdge[degree[N]+100];
+      HeadOfSVG head_of_svg;
+      input_file.read( (char*)&head_of_svg , sizeof(head_of_svg));
+      //printf("%d", degree[N]);
+      for(int i = 0; i < N; ++i) {
+        BodyHeadOfSVG body_head;
+        input_file.read( (char*)&body_head , sizeof(body_head));
+        for(int j = degree[i]; j < degree[i+1]; ++j){
+          BodyPartOfSVGWithRange body_part;
+          input_file.read((char*)&body_part , sizeof(body_part));
+          //printf("%d\t", __temp__tempSVGEdge__.v);
+          edge[j].v = body_part.dest_index;
+          edge[j].dis = body_part.dest_dis;
+          edge[j].deleted = 0;
           edge[j].begin_pos = body_part.begin_pos;
           edge[j].end_pos = body_part.end_pos;
           edge[j].pos = j - degree[i];
@@ -214,7 +261,7 @@ namespace JIAJUN_DGG_PRUNING{
   //
   //	for(int i = 0; i < N; ++i) {
   //		for(int j = degree[i]; j < degree[i+1]; ++j){
-  //			// printf("%d\w", j);
+  //			// fprintf(stderr,"%d\w", j);
   //      SVGEdgeForRead __temp__tempSVGEdge__;
   //			fread(&(__temp__tempSVGEdge__), sizeof(SVGEdgeForRead), 1, fe);
   //			//printf("%d\t", __temp__tempSVGEdge__.v);
@@ -239,8 +286,9 @@ namespace JIAJUN_DGG_PRUNING{
     DGG & dgg = * this;
     typedef SVGEdge node;
     const double maxError = 1e-5;
-    node a, b;
+    
     struct CMP{
+      node a, b;
       bool operator()(node a, node b){ return a.dis > b.dis; }
     };
     std::priority_queue <node, std::vector<node>, CMP > q;
@@ -254,40 +302,41 @@ namespace JIAJUN_DGG_PRUNING{
       q.push(dgg.edge[i]);
       nodeMap[dgg.edge[i].v] = i;
     }
-    while (!q.empty()){
-      a = q.top();
+    int cnt = 0;
+    while (!q.empty()) {
+      node a = q.top();
+      cnt++;
       q.pop();
       if(mark[a.v])continue;
       bool found = 0;
       for(int i = dgg.degree[a.v]; i < dgg.degree[a.v + 1]; ++i){
         if(abs(dis[dgg.edge[i].v] - maxDist) < maxError || a.v == dgg.edge[i].v) continue;
         if(a.dis + dgg.edge[i].dis < dis[dgg.edge[i].v] * (1 + eps)){
+          node b;
           b.v = dgg.edge[i].v;
+          
           b.dis = min((double)a.dis + (double)dgg.edge[i].dis, dis[dgg.edge[i].v] );
           dis[b.v] = b.dis;
           assert(nodeMap.count(dgg.edge[i].v));
           dgg.edge[nodeMap[dgg.edge[i].v]].deleted = 1;
 #if _debug
-          printf("Found:: src: %d a.v: %d dgg.edge[i]: %d              %lf   %lf   %lf\n",src, a.v, dgg.edge[i].v, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis);
+          fprintf(stderr,"Found:: src: %d a.v: %d dgg.edge[i]: %d              %lf   %lf   %lf\n",src, a.v, dgg.edge[i].v, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis);
           system("pause");
 #endif
-
 #if _debug
           if (!found){
 
-            printf("Not found!! %d %d %d %lf %lf %lf \n", src, a.v, dgg.edge[i].v, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis);
-            printf("%d\n",src);
+            fprintf(stderr,"Not found!! %d %d %d %lf %lf %lf \n", src, a.v, dgg.edge[i].v, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis);
+            fprintf(stderr,"%d\n",src);
 
             for (int j = dgg.degree[dgg.degree[src] ]; j < dgg.degree[dgg.degree[src] + 1]; ++j)
-              printf("%d  ", dgg.edge[j].v);
-            printf("\n");
+              fprintf(stderr,"%d  ", dgg.edge[j].v);
+            fprintf(stderr,"\n");
 
             system("pause");
-#endif
-
-            //++++++dgg.edge[i].deleted = 1;
+#endif      //++++++dgg.edge[i].deleted = 1;
 #if _debug				
-            printf("%d %d %d %lf   %lf   %lf %d\n", src, a.v, i, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis, finalDeg);
+            fprintf(stderr,"%d %d %d %lf   %lf   %lf %d\n", src, a.v, i, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis, finalDeg);
             if (i % 5 == 0) system("pause");
 #endif
             q.push(b);
@@ -295,7 +344,7 @@ namespace JIAJUN_DGG_PRUNING{
         }
         mark[a.v] = 1;
       }
-
+      fprintf(stderr,"cnt %d\n" , cnt);
       for (int i = dgg.degree[src]; i != dgg.degree[src + 1]; ++i)
       {
         dis[dgg.edge[i].v] = maxDist;
@@ -304,7 +353,7 @@ namespace JIAJUN_DGG_PRUNING{
       dis[src] = maxDist;
       mark[src] = 0;
 #if _debug
-      printf("%d  %d\n", dgg.degree[src + 1] - dgg.degree[src], finalDeg);
+      fprintf(stderr,"%d  %d\n", dgg.degree[src + 1] - dgg.degree[src], finalDeg);
 #endif
     }
 
@@ -315,8 +364,11 @@ namespace JIAJUN_DGG_PRUNING{
       HeadOfSVG head_of_svg(0 , N-1 , N );     
       output_file.write((char*)&head_of_svg , sizeof(head_of_svg));
 
+
+			double ave_degree = 0;
       for (int source_index = 0; source_index < N; ++source_index) {
-        BodyHeadOfSVG body_header(source_index , degree[source_index+1] - degree[source_index]);
+        ave_degree += degree[source_index+1] - degree[source_index];
+				BodyHeadOfSVG body_header(source_index , degree[source_index+1] - degree[source_index]);
         output_file.write((char*)&body_header , sizeof(body_header));
         //printf("%d %d \n" , source_index,  degree[source_index+1] - degree[source_index]);
         //vector<BodyPartOfSVGWithK> body_parts(degree[source_index+1] - degree[source_index]);
@@ -335,11 +387,52 @@ namespace JIAJUN_DGG_PRUNING{
           }
         }
 
-
-
         for (int j = degree[source_index]; j < degree[source_index+1]; j++) {
           BodyPartOfSVGWithAngle b;
-          b.angle = edge[j].angle;
+          b.angle = 0;
+          if (edge[j].begin_pos == -1) {
+            b.begin_pos = -1;
+            b.end_pos = -1;
+          }else{
+            b.begin_pos = origin2current[edge[j].begin_pos];
+            b.end_pos = origin2current[edge[j].end_pos];
+          }
+          b.dest_dis = edge[j].dis;
+          b.dest_index = edge[j].v;
+          //printf("angle %lf pos %d dis %lf index %d end_pos %d\n" , b.angle, b.begin_pos, b.dest_dis, b.dest_index, b.end_pos);
+          output_file.write((char*)&b , sizeof(b));
+        }
+      }
+      output_file.close();
+			printf("ave degree after pruning %lf\n" , ave_degree);
+		}
+
+    void DGG::writeSVGBinary_new(const char * output_filename)
+    {
+      ofstream output_file (output_filename , ios::out | ios::binary);
+      HeadOfSVG head_of_svg(0 , N-1 , N );     
+      output_file.write((char*)&head_of_svg , sizeof(head_of_svg));
+
+      for (int source_index = 0; source_index < N; ++source_index) {
+        BodyHeadOfSVG body_header(source_index , degree[source_index+1] - degree[source_index]);
+        output_file.write((char*)&body_header , sizeof(body_header));
+
+        vector<int> origin2current(origin_neigh_num[source_index],-1);
+        for (int j = degree[source_index]; j < degree[source_index+1];j++) {
+          origin2current[edge[j].pos] = j - degree[source_index];
+        }
+
+        int start_pos = 0;
+        for (int j = 0; j < origin2current.size(); ++j) {
+          if (origin2current[j] == -1) {
+            origin2current[j] = start_pos;
+          }else{
+            start_pos = origin2current[j];
+          }
+        }
+
+        for (int j = degree[source_index]; j < degree[source_index+1]; j++) {
+          BodyPartOfSVGWithRange b;
           if (edge[j].begin_pos == -1) {
             b.begin_pos = -1;
             b.end_pos = -1;
@@ -356,19 +449,18 @@ namespace JIAJUN_DGG_PRUNING{
       output_file.close();
     }
 
-
     void DGG::write(const char * filename)
     {
       //printf("__filename %s\n" , filename);
       //assert(strlen(filename) >= 70);
-      printf("Writing start");
+      fprintf(stderr,"Writing start");
       char buf[1024];
       sprintf(buf, "%s_new.edge", filename);
-      printf("%s", buf);
+      fprintf(stderr,"%s", buf);
       FILE * fp = fopen(buf, "wb");
       fwrite(edge, sizeof(SVGEdge), degree[N], fp);
       fclose(fp);
-      printf("Writing edge done!\n");
+      fprintf(stderr,"Writing edge done!\n");
       sprintf(buf, "%s_new_degree.txt", filename);
       fp = fopen(buf, "w");	
       fprintf(fp, "%d\n" , N);
@@ -376,7 +468,7 @@ namespace JIAJUN_DGG_PRUNING{
         fprintf(fp, "%d\n", degree[i+1] - degree[i]);
       }
       fclose(fp);
-      printf("Written to file!\n");
+      fprintf(stderr,"Written to file!\n");
 
     }
 
@@ -406,7 +498,7 @@ namespace JIAJUN_DGG_PRUNING{
         a.dis = dgg.edge[i].dis;
         dis[a.v] = a.dis;
 #ifdef _debug
-        printf("%d %lf\n", a.v, a.dis);
+        fprintf(stderr,"%d %lf\n", a.v, a.dis);
 #endif
         q.push(a);
       }
@@ -418,7 +510,7 @@ namespace JIAJUN_DGG_PRUNING{
         for(int i = dgg.degree[a.v]; i < dgg.degree[a.v + 1]; ++i){
           if(abs(dis[dgg.edge[i].v] - maxDist) < 1e-5 || a.v == dgg.edge[i].v) continue;
 #ifdef _debug
-          printf("src: %d a.v: %d dgg.edge[i]: %d              %lf   %lf   %lf\n",src, a.v, dgg.edge[i].v, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis);
+          fprintf(stderr,"src: %d a.v: %d dgg.edge[i]: %d              %lf   %lf   %lf\n",src, a.v, dgg.edge[i].v, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis);
 #endif
           if(a.dis + dgg.edge[i].dis < dis[dgg.edge[i].v] * (1 + eps)){
             b.v = dgg.edge[i].v;
@@ -431,7 +523,7 @@ namespace JIAJUN_DGG_PRUNING{
             dgg.edge[j].deleted = 1;
 
 #ifdef _debug				
-            printf("%d %d %d %lf   %lf   %lf %d\n", src, a.v, i, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis, finalDeg);
+            fprintf(stderr,"%d %d %d %lf   %lf   %lf %d\n", src, a.v, i, dis[dgg.edge[i].v], a.dis, dgg.edge[i].dis, finalDeg);
             if (i % 5 == 0) system("pause");
 #endif
             q.push(b);
@@ -448,14 +540,14 @@ namespace JIAJUN_DGG_PRUNING{
       dis[src] = maxDist;
       mark[src] = 0;
 #ifdef _debug
-      printf("%d  %d\n", dgg.degree[src + 1] - dgg.degree[src], finalDeg);
+      fprintf(stderr,"%d  %d\n", dgg.degree[src + 1] - dgg.degree[src], finalDeg);
 #endif
     }
 #endif
 
     void DGG::pruning(){
       //read file
-      printf("%lf\n", eps);
+      fprintf(stderr,"%lf\n", eps);
       DGG & dgg = * this;
       int Count = 0;
       //pruning using dijkstra
@@ -475,7 +567,7 @@ namespace JIAJUN_DGG_PRUNING{
         for (int j = 0; j != dgg.degree[dgg.N]; ++ j)
           if (abs(dis[j] - maxDist) > eps || mark[j])
           {
-            printf("Error!! %d", j );
+            fprintf(stderr,"Error!! %d", j );
             system("pause");
           }
 #endif
@@ -500,7 +592,7 @@ namespace JIAJUN_DGG_PRUNING{
           [](SVGEdge e){return !e.deleted;});
         newdgg.degree[i + 1] = numOfEdges;
       }
-      printf("Total number of edges: %d\n", numOfEdges);
+      fprintf(stderr,"Total number of edges: %d\n", numOfEdges);
       newdgg.edge = new SVGEdge[numOfEdges + 100];
 
       int _numOfEdges = 0;
@@ -523,7 +615,7 @@ namespace JIAJUN_DGG_PRUNING{
       newdgg.edge = NULL;
       dgg.degree = newdgg.degree;
       newdgg.degree = NULL;
-      printf("Removing edge#edge: %d\n", dgg.degree[dgg.N]);
+      fprintf(stderr,"Removing edge#edge: %d\n", dgg.degree[dgg.N]);
     }
 
 
@@ -532,13 +624,28 @@ namespace JIAJUN_DGG_PRUNING{
       DGG dgg;
       dgg.readWxnBinary(input_file_name.c_str());
       dgg.eps = eps;
-      printf("Before: %d\n", dgg.degree[dgg.N]);
+			double average_degree_before = dgg.degree[dgg.N] / dgg.N;
+			printf("Average_degree_before %lf\n", average_degree_before);
       ElapasedTime t;
       dgg.pruning();
       prune_time = t.getTime();
-      printf("After: %d\n", dgg.degree[dgg.N]);
+			double average_degree_after = dgg.degree[dgg.N] / dgg.N;
+			printf("Average_degree_after %lf , percenter %lf\n", average_degree_after, (double)average_degree_after / average_degree_before );
       output_filename = input_file_name.substr(0,input_file_name.length()-7) + "_pruning.binary";
       dgg.writeSVGBinary(output_filename.c_str());
+    }
+    void dgg_pruning_new(const std::string& input_file_name, double eps, std::string& output_filename, double& prune_time)
+    {
+      DGG dgg;
+      dgg.readWxnBinary_new(input_file_name.c_str());
+      dgg.eps = eps;
+      fprintf(stderr,"Before: %d\n", dgg.degree[dgg.N]);
+      ElapasedTime t;
+      dgg.pruning();
+      prune_time = t.getTime();
+      fprintf(stderr,"After: %d\n", dgg.degree[dgg.N]);
+      output_filename = input_file_name.substr(0,input_file_name.length()-7) + "_pruning.binary";
+      dgg.writeSVGBinary_new(output_filename.c_str());
     }
 
   }

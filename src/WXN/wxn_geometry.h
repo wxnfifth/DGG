@@ -10,7 +10,7 @@ struct PointOnFace{
     PointOnFace(){}
     PointOnFace(int _face_id , CPoint3D _v):face_id_(_face_id),v(_v){}
     void print(const string& s){
-        printf("PointOnFace %s: %d , %lf %lf %lf\n" , s.c_str() , face_id_ , v.x , v.y , v.z);
+        fprintf(stderr,"PointOnFace %s: %d , %lf %lf %lf\n" , s.c_str() , face_id_ , v.x , v.y , v.z);
     }
 };
 

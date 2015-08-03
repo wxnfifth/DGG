@@ -1,5 +1,6 @@
 #ifndef _SVG_DEFINITION_H_
 #define _SVG_DEFINITION_H_
+#include <stdint.h>
 
 struct HeadOfSVG {
   int begin_vertex_index;
@@ -14,7 +15,7 @@ struct HeadOfSVG {
     num_of_vertex(_num_of_vertex){}
   HeadOfSVG(){}
   void print(){
-    printf("head of svg : num_of_vertex %d\n" , num_of_vertex);
+    fprintf(stderr,"head of svg : num_of_vertex %d\n" , num_of_vertex);
   }
 };
 
@@ -61,7 +62,6 @@ struct BodyPartOfSVGWithAngle{
     }
 };
 
-
 struct BodyPartOfSVGWithK : BodyPartOfSVG{
     int rank_k;
     BodyPartOfSVGWithK(){}
@@ -72,5 +72,39 @@ struct BodyPartOfSVGWithK : BodyPartOfSVG{
         return rank_k < other.rank_k;
     }
 };
+
+struct SVGEdgeWithAngle{
+    int dest_index;
+    double dest_dis;
+    double angle;
+    SVGEdgeWithAngle(){}
+    SVGEdgeWithAngle(int _dest_index , float _dest_dis, float _angle):
+        dest_index(_dest_index),
+        dest_dis(_dest_dis),
+        angle(_angle)
+    {
+    }
+    bool operator<(const SVGEdgeWithAngle& o) const{
+      return angle < o.angle;
+    }
+};
+
+struct BodyPartOfSVGWithRange{
+    int dest_index;
+    double dest_dis;
+    short int begin_pos;
+    short int end_pos;
+    BodyPartOfSVGWithRange(){}
+    BodyPartOfSVGWithRange(int _dest_index , float _dest_dis, short int _begin_pos, short int _end_pos):
+        dest_index(_dest_index),
+        dest_dis(_dest_dis),
+        begin_pos(_begin_pos),
+        end_pos(_end_pos)
+    {
+    }
+};
+
+
+
 
 #endif
